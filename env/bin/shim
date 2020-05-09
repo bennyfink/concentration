@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+export NODE_PATH=/Users/benfink/Desktop/amazonSDE20/concentration/env/lib/node_modules
+export NPM_CONFIG_PREFIX=/Users/benfink/Desktop/amazonSDE20/concentration/env
+export npm_config_prefix=/Users/benfink/Desktop/amazonSDE20/concentration/env
+exec /Users/benfink/Desktop/amazonSDE20/concentration/env/bin/node "$@"

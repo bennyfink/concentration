@@ -1,0 +1,83 @@
+:root {
+  --background-color: #F06292;
+  --cell-color: #F48FB1;
+  --cell-color-hover: rgba(255, 255, 255, .3);
+  --emoji-size: 7.5vw;
+  --column-number: 5;
+  --transition: .3s;
+  --zoom: 1.5;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-color);
+  user-select: none;
+  overflow-x: hidden;
+}
+
+.input {
+text-align: center;
+margin: 0px;
+top: 50%;
+left: 8%;
+position: relative;
+}
+
+.button {
+transition-duration: 0.4s;
+font-size: 100px;
+float: left;
+}
+
+.button:hover {
+background-color: black; /* Green */
+border: none;
+color: white;
+text-align: center;
+text-decoration: none;
+display: center-block;
+}
+
+.grid {
+  display: grid;
+  position: relative;
+  width: 50vw;
+  grid-template-columns: repeat(var(--column-number), 1fr);
+  margin: 5% 0;
+  left: 45vw;
+  transform: translateX(-50%);
+  /*background-color:;*/
+}
+
+.grid > div {
+  position: relative;
+  height: 0;
+  overflow: hidden;
+  text-align: center;
+  padding-bottom: 90%;
+  margin: 5%;
+  border-radius: 1vw;
+  transition: var(--transition);
+  background-color: var(--cell-color);
+  cursor: pointer;
+}
+
+.emoji {
+  position: absolute;
+  font-size: var(--emoji-size-1);
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%) rotateZ(0deg);
+  transition: var(--transition);
+}
+
+.grid > div:hover {
+  z-index: 999;
+  transform: scale(var(--zoom));
+  background-color: var(--cell-color-hover);
+}
+
+.grid > div:hover .emoji {
+  transform: translateX(-50%) translateY(-50%) rotateZ(360deg);
+}
