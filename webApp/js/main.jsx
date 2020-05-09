@@ -7,10 +7,11 @@ class Concentration extends React.Component {
       super(props);
       this.state = {
         gridSize: null,
-        url: null,
+        userName: null,
       };
       this.handleSubmit = this.handleSubmit.bind(this);
-      this.handleChange = this.handleChange.bind(this);
+      this.handleChangeNum = this.handleChangeNum.bind(this);
+      this.handleChangeName = this.handleChangeName.bind(this);
     }
   /*
     componentDidMount() {
@@ -47,22 +48,36 @@ class Concentration extends React.Component {
 
     }
 
-    handleChange (e) {
+    handleChangeNum (e) {
         this.setState({
             gridSize: e.target.value,
         });
     }
 
+    handleChangeName (e) {
+        this.setState({
+            userName: e.target.value,
+        });
+    }
+
 
     render() {
-        const { gridSize } = this.state;
+        const { gridSize, userName } = this.state;
       return (
         <div className="App">
             <div className="board">
                 <form className="comment-form" onSubmit={this.handleSubmit}>
+                    <label for="userName">Enter a username:</label>
+                    <input type="text" id="userName" name="User Name" value={userName} onChange={this.handleChangeName}></input>
                     <label for="boardNum">Enter Number of pairs you would like to use:</label>
-                    <input type="number" id="boardNum" name="boardNum" value={gridSize} onChange={this.handleChange}></input>
-                    <Link to="/templates/play.html">
+                    <input type="number" id="boardNum" name="boardNum" value={gridSize} onChange={this.handleChangeNum}></input>
+                    <Link to={{
+                        pathname: "/templates/play.html",
+                        state:  {
+                            boardSize: gridSize,
+                            userName:  userName,
+                        }
+                    }}>
                         <input type="submit" value="Play!"></input>
                     </Link>
                 </form>

@@ -8,32 +8,84 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 100
 
 Resources:
-  HelloWorldFunction:
+  LeaderboardFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: hello-world/
+      CodeUri: js/
       Handler: app.lambdaHandler
       Runtime: nodejs12.x
       Events:
-        HelloWorld:
+        Leaderboard:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /leaderboard
+            Method: get
+
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: js/hello-world/
+      Handler: hello-world
+      Runtime: go1.x
+      Tracing: Active # https://docs.aws.amazon.com/lambda/latest/dg/lambda-x-ray.html
+      Events:
+        CatchAll:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /hello
+            Method: GET
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          PARAM1: VALUE
+
+  Resources:
+  BestFactorsFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: py/
+      Handler: bestFactors.lambda_handler
+      Runtime: python3.8
+      Events:
+        BestFactors:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /factors
             Method: get
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
+  LeaderboardApi:
     Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/leaderboard/"
+  LeaderboardFunction:
+    Description: "retrieves leader board - Lambda Function ARN"
+    Value: !GetAtt LeaderboardFunction.Arn
+  LeaderboardFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt LeaderboardFunctionRole.Arn
+
+  HelloWorldAPI:
+    Description: "API Gateway endpoint URL for Prod environment for First Function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
   HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
+    Description: "First Lambda Function ARN"
     Value: !GetAtt HelloWorldFunction.Arn
   HelloWorldFunctionIamRole:
     Description: "Implicit IAM Role created for Hello World function"
     Value: !GetAtt HelloWorldFunctionRole.Arn
+
+  BestFactorsApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  BestFactorsFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt BestFactorsFunction.Arn
+  BestFactorsFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt BestFactorsRole.Arn
+
