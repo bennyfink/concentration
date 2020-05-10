@@ -119,7 +119,7 @@ class Play extends React.Component {
         console.log("done fetching")
         console.log
         for (i = 2; i < boardSize*2 + 2; i++) {
-          temp.add(i)
+          temp.add(i.toString())
         }
 
         console.log("heading into while")
@@ -134,19 +134,21 @@ class Play extends React.Component {
         
         // these may need to be strings?
         while (temp.size != 0) {
-          if (!pairs.has(index1) && !pairs.has(index2) && index2 != index1) {
-            pairs.set(index1, index2);
-            pairs.set(index2, index1);
+          if (!pairs.has(index1.toString()) && !pairs.has(index2.toString()) && index2 != index1) {
+            pairs.set(index1.toString() , index2.toString());
+            pairs.set(index2.toString(), index1.toString());
 
-            temp.delete(index1);
-            temp.delete(index2);
+            temp.delete(index1.toString());
+            temp.delete(index2.toString());
 
-            numToEmoji.set(index1, emojis[emojiCounter]);
-            numToEmoji.set(index2, emojis[emojiCounter]);
+            numToEmoji.set(index1.toString(), emojis[emojiCounter]);
+            numToEmoji.set(index2.toString(), emojis[emojiCounter]);
 
             // to render cards
-            mapper.push(itemCounter++);
-            mapper.push(itemCounter++);
+            mapper.push(itemCounter.toString());
+            itemCounter++;
+            mapper.push(itemCounter.toString());
+            itemCounter++;
 
             emojiCounter++;
           } else if (temp.size == 4) {
@@ -155,26 +157,30 @@ class Play extends React.Component {
               littleAr.push(entry);
             })
 
-            pairs.set(littleAr[0], littleAr[1]);
-            pairs.set(littleAr[1], littleAr[0]);
-            pairs.set(littleAr[2], littleAr[3]);
-            pairs.set(littleAr[3], littleAr[2]);
+            pairs.set(littleAr[0].toString(), littleAr[1].toString());
+            pairs.set(littleAr[1].toString(), littleAr[0].toString());
+            pairs.set(littleAr[2].toString(), littleAr[3].toString());
+            pairs.set(littleAr[3].toString(), littleAr[2].toString());
 
-            temp.delete(littleAr[0]);
-            temp.delete(littleAr[1]);
-            temp.delete(littleAr[2]);
-            temp.delete(littleAr[3]);
+            temp.delete(littleAr[0].toString());
+            temp.delete(littleAr[1].toString());
+            temp.delete(littleAr[2].toString());
+            temp.delete(littleAr[3].toString());
 
-            numToEmoji.set(littleAr[0], emojis[emojiCounter]);
-            numToEmoji.set(littleAr[1], emojis[emojiCounter++]);
-            numToEmoji.set(littleAr[2], emojis[emojiCounter]);
-            numToEmoji.set(littleAr[3], emojis[emojiCounter]);
+            numToEmoji.set(littleAr[0].toString(), emojis[emojiCounter]);
+            numToEmoji.set(littleAr[1].toString(), emojis[emojiCounter++]);
+            numToEmoji.set(littleAr[2].toString(), emojis[emojiCounter]);
+            numToEmoji.set(littleAr[3].toString(), emojis[emojiCounter]);
 
             // to render cards
-            mapper.push(itemCounter++);
-            mapper.push(itemCounter++);
-            mapper.push(itemCounter++);
-            mapper.push(itemCounter++);
+            mapper.push(itemCounter.toString());
+            itemCounter++;
+            mapper.push(itemCounter.toString());
+            itemCounter++;
+            mapper.push(itemCounter.toString());
+            itemCounter++;
+            mapper.push(itemCounter.toString());
+            itemCounter++;
           }
 
           index1 = Math.floor(Math.random()*boardSize*2 + 2);
@@ -230,7 +236,7 @@ class Play extends React.Component {
     e.preventDefault();
     const {  studyingMap, checkMatch, } = this.state;
     let inputId = e.target.id;
-    selected.add(parseInt(inputId));
+    selected.add(inputId);
 
     
     // if player is studing board, do nothing
@@ -238,31 +244,32 @@ class Play extends React.Component {
       return
     }
 
-    if (parseInt(inputId) === parseInt(lastClick) && checkMatch) {
+    if (inputId === lastClick && checkMatch) {
       return
     }
 
 
     // check that user does not click a card already matched
       if (matched) {
-        if (matched.has(parseInt(inputId))) {
-          return
+        if (matched.has(inputId)) {
+          return 
         }
       }
 
     //root.style.setProperty('--emoji-size-1', '7.5vw')
     let label = `--emoji-size-${inputId}`
+    
 
-    //document.getElementById(inputId).style.setProperty(label, '3.5vw')
+    document.getElementById(inputId).style.setProperty(label, '3.5vw')
 
     // Check to see if 
-    if (parseInt(lastClick) === pairs.get(parseInt(inputId)) && checkMatch) {
+    if (lastClick === pairs.get(inputId) && checkMatch) {
       console.log(lastClick)
       console.log(pairs.get(inputId))
       console.log(inputId)
-      matched.add(parseInt(lastClick))
-      matched.add(parseInt(inputId))
-      selected.delete(parseInt(inputId))
+      matched.add(lastClick)
+      matched.add(inputId)
+      selected.delete(inputId)
 
       this.sleep(500)
         .then( () => {
@@ -270,8 +277,8 @@ class Play extends React.Component {
         })
 
     } else if (checkMatch) {
-      selected.delete(parseInt(inputId))
-      selected.delete(parseInt(inputId))
+      selected.delete(inputId)
+      selected.delete(lastClick)
 
       this.sleep(500)
       .then( () => {
@@ -281,20 +288,20 @@ class Play extends React.Component {
         this.sleep(1500)
         .then( () => {
             cards.forEach((card) => {
-              if (!matched.has(parseInt(card.id)) && !selected.has(parseInt(card.id))) {
-               // document.getElementById(card.id).style.setProperty(`--emoji-size-${card.id}`, '0vw')
+              if (!matched.has(card.id) && !selected.has(card.id)) {
+                document.getElementById(card.id).style.setProperty(`--emoji-size-${card.id}`, '0vw')
             }
           })
-          //let oldLabel = `--emoji-size-${lastClick}`
-          //document.getElementById(inputId).style.setProperty(label, '0vw')
-          //document.getElementById(lastClick).style.setProperty(oldLabel, '0vw')
+         // let oldLabel = `--emoji-size-${lastClick}`
+        //  document.getElementById(inputId).style.setProperty(label, '0vw')
+         // document.getElementById(lastClick).style.setProperty(oldLabel, '0vw')
           //console.log(oldLabel)
         })
       })
 
     } else {
         lastClick = inputId
-        //document.getElementById(inputId).style.setProperty(label, '3.5vw')
+       // document.getElementById(inputId).style.setProperty(label, '3.5vw')
     }
 
     // toggle checkMatch
@@ -303,11 +310,15 @@ class Play extends React.Component {
     console.log(lastClick);
     console.log(pairs.get(inputId));
     console.log(pairs);
+    console.log("============================")
+    console.log(cards)
+    console.log(selected)
+    console.log(matched)
 
     // ensure all matched display properly
     if (matched.size > 0) {
       matched.forEach((card) => {
-         // document.getElementById(card).style.setProperty(`--emoji-size-${card}`, '3.5vw');
+          document.getElementById(card).style.setProperty(`--emoji-size-${card}`, '3.5vw');
       })
     }
 
@@ -327,7 +338,7 @@ class Play extends React.Component {
     e.preventDefault();
     cards.forEach(input => {
       let label = `--emoji-size-${input.id}`
-      //document.getElementById(input.id).style.setProperty(label, '0vw')
+      document.getElementById(input.id).style.setProperty(label, '0vw')
     });
 
 
@@ -354,56 +365,6 @@ class Play extends React.Component {
     var style1 = {
       '---column-numbergrid-template-columns': `${(size*2)/height}`
     };
-
-
-    var style3 = {
-      'font-size': 'var(--emoji-size-4)'
-    };
-
-    var style4 = {
-      'font-size': 'var(--emoji-size-5)'
-    };
-
-    var style5 = {
-      'font-size': 'var(--emoji-size-6)'
-    };
-
-    var style6 = {
-      'font-size': 'var(--emoji-size-7)'
-    };
-
-    var style7 = {
-      'font-size': 'var(--emoji-size-8)'
-    };
-
-    var style8 = {
-      'font-size': 'var(--emoji-size-9)'
-    };
-
-    var style9 = {
-      'font-size': 'var(--emoji-size-10)'
-    };
-
-    var style10 = {
-      'font-size': 'var(--emoji-size-11)'
-    };
-
-    var style11 = {
-      'font-size': 'var(--emoji-size-12)'
-    };
-
-    var style12 = {
-      'font-size': 'var(--emoji-size-13)'
-    };
-    var style13 = {
-      'font-size': 'var(--emoji-size-14)'
-    };
-    var style14 = {
-      'font-size': 'var(--emoji-size-15)'
-    };
-    var style15 = {
-      'font-size': 'var(--emoji-size-16)'
-    };
     
     let checkBoot = firstRun;
     if (checkBoot) {
@@ -424,7 +385,7 @@ class Play extends React.Component {
             // Might not need this first line (put handler in render)
             //input.addEventListener("click", this.handleCard);
             let label = `--emoji-size-${input.id}`;
-            //document.getElementById(input.id).style.setProperty(label, '3.5vw');
+            document.getElementById(input.id).style.setProperty(label, '3.5vw');
             })
           }
         });
@@ -468,170 +429,3 @@ BootUp.propTypes = {
 };
 
 export default Play;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-
-const cards = document.querySelectorAll('.item')
-const root = document.documentElement
-//root.style.setProperty('--emoji-size-1', '3.5vw')
-//root.style.setProperty('--emoji-size-2', '3.5vw')
-
-//as the value in the input changes, do something.
-var elem = document.getElementById("1")
-
-var checkMatch = false
-var studyingMap = true
-
-var pairs = new Map()
-var matched = new Set()
-var selected = new Set()
-
-pairs.set('3','9')
-pairs.set('9','3')
-var lastClick
-
-elem.addEventListener("click", handleInputChange)
-
-cards.forEach(input => {
-    input.addEventListener("click", handleCard)
-    let label = `--emoji-size-${input.id}`
-    document.getElementById(input.id).style.setProperty(label, '3.5vw')
-})
-
-
-// clicking 'start' resets the board
-function handleInputChange (e) {
-  //let value = e.target.value
-  //let inputId = e.target.parentNode.id
-  cards.forEach(input => {
-    let label = `--emoji-size-${input.id}`
-    document.getElementById(input.id).style.setProperty(label, '0vw')
-  })
-  
-  // clear matches
-  matched.clear()
-
-  // player is playing
-  studyingMap = false
-  
- // root.style.setProperty('--emoji-size-2', '0vw');
-  //root.style.font-size('0vw')
-
-}
-
-function handleCard (e) {
-
-  let inputId = e.target.id;
-  selected.add(inputId)
-  
-  // if player is studing board, do nothing
-  if (studyingMap) {
-    return
-  }
-
-  if (inputId === lastClick && checkMatch) {
-    return
-  }
-
-
-  // check that user does not click a card already matched
-  if (matched.has(inputId)) {
-    return
-  }
-
-  //root.style.setProperty('--emoji-size-1', '7.5vw')
-  let label = `--emoji-size-${inputId}`
-
-  document.getElementById(inputId).style.setProperty(label, '3.5vw')
-
-  // Check to see if 
-  if (lastClick === pairs.get(inputId) && checkMatch) {
-    matched.add(lastClick)
-    matched.add(inputId)
-    selected.delete(inputId)
-
-    sleep(500)
-      .then( () => {
-      alert("Congrats! You have identified a pair!")
-      })
-
-  } else if (checkMatch) {
-    selected.delete(inputId)
-    selected.delete(lastClick)
-    sleep(500)
-    .then( () => {
-    alert("Oops! These are not a match!")
-    })
-    .then( () => {
-      sleep(1500)
-      .then( () => {
-        cards.forEach((card) => {
-          if (!matched.has(card.id) && !selected.has(card.id)) {
-            document.getElementById(card.id).style.setProperty(`--emoji-size-${card.id}`, '0vw')
-        }
-      }
-      )
-        //let oldLabel = `--emoji-size-${lastClick}`
-        //document.getElementById(inputId).style.setProperty(label, '0vw')
-        //document.getElementById(lastClick).style.setProperty(oldLabel, '0vw')
-        //console.log(oldLabel)
-      })
-    })
-
-  } else {
-      lastClick = inputId
-      //document.getElementById(inputId).style.setProperty(label, '3.5vw')
-  }
-
-  // toggle checkMatch
-  checkMatch = checkMatch ? false : true
-  console.log(inputId)
-  console.log(lastClick)
-  console.log(pairs.get(inputId))
-  console.log(pairs)
-
-  // ensure all matched display properly
-  matched.forEach((card) => {
-    document.getElementById(card.id).style.setProperty(`--emoji-size-${card.id}`, '3.5vw')
-  })
-
-  //lastClick = inputId this did not work do to timing issues with the promises above
-}
-
-// Define a sleep function so we can show emoji before recognizing a pair alert
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-*/
