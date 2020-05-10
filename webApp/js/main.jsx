@@ -66,11 +66,11 @@ class Concentration extends React.Component {
       return (
         <div className="App">
             <div className="board">
-                <form className="comment-form" onSubmit={this.handleSubmit}>
-                    <label for="userName">Enter a username:</label>
-                    <input type="text" id="userName" name="User Name" value={userName} onChange={this.handleChangeName}></input>
-                    <label for="boardNum">Enter Number of pairs you would like to use:</label>
-                    <input type="number" id="boardNum" name="boardNum" value={gridSize} onChange={this.handleChangeNum}></input>
+                <form className="form-wrap" onSubmit={this.handleSubmit}>
+                    <p><label for="userName">Enter a nickname!</label></p>
+                    <input type="text" id="userName" name="User Name" placeholder="Guest" value={userName} onChange={this.handleChangeName}></input>
+                    <p><label for="boardNum">Enter the number of pairs you would like to match (between 2 and 50):</label></p>
+                    <input type="number" id="boardNum" name="boardNum" placeholder="8" value={gridSize} onChange={this.handleChangeNum}></input>
                     <Link to={{
                         pathname: "/templates/play.html",
                         state:  {

@@ -81,3 +81,59 @@ display: center-block;
 .grid > div:hover .emoji {
   transform: translateX(-50%) translateY(-50%) rotateZ(360deg);
 }
+
+.pcongrats {
+  text-align: center;
+}
+
+.congrats {
+  color: seagreen;
+  text-align: center;
+  font-size: 5vw;
+}
+
+/* Forms */
+
+.form-wrap{
+  width: 35%;
+  margin: 0 auto;
+  top: 50vw;
+  font-size: 40px;
+
+  border: 15px solid green;
+  padding: 50px;
+}
+
+.left-form{
+width: 47.5%;
+
+float: left;
+}
+
+.right-form{
+width: 47.5%;
+
+float: right;
+}
+
+
+@media screen and (max-width: 1200px) {
+.form-wrap{
+  width: 90%;
+}
+}
+
+
+@media screen and (max-width: 600px) {
+.form-wrap{
+  width: 90%;
+}
+
+.left-form{
+  width: 100%;
+}
+
+.right-form{
+  width: 100%;
+}
+}

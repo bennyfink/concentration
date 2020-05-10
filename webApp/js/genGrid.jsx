@@ -12,13 +12,10 @@ var player;
 var height;
 var size;
 var setupDone = false;
+var startTime;
 
 function ListBlocks ({ pic, fxn, num2e }) {
     let font = {'font-size': `var(--emoji-size-${pic})`}
-    console.log('Three-burritos================')
-    console.log(numToEmoji.get(pic))
-    console.log(num2e)
-    console.log(pic)
     if (pic == size*2+1) {
       setupDone = true;
     }
@@ -49,17 +46,35 @@ function BootUp ({ go, sleep }) {
   return (null)
 }
 
+function Congrats ({ go, points, notPlaying, win, score, time, }) {
+  if (go && !win) {
+    return (<div class="congrats">Nice work! You've identified a pair (+{points} points)</div>)
+  } else if (notPlaying) {
+    return (<div class="congrats">Press start to play!</div>)
+  } else if (win) {
+    return (<div class="congrats">Congrats {player}! You finished in {time} seconds with a score of {score}. You can play this board again or click on one of the links below.</div>)
+    // Display link to post to leaderboard here.
+  } else {
+    return (<div class="congrats">Try to identify a pair of emojis!</div>)
+  }
+}
+
 class Play extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      emojis: new Array(),
+      n2e: new Map(),
       checkMatch: false,
       studyingMap: true,
       firstRun: true,
-      emojis: new Array(),
-      n2e: new Map(),
+      score: 0,
+      newPoints: 0,
+      success: false,
+      clicks: 0,
+      time: 0,
     };
-    //this.makeGrid = this.makeGrid.bind(this);
+
     this.handleStart = this.handleStart.bind(this);
     this.sleep = this.sleep.bind(this);
     this.handleCard = this.handleCard.bind(this);
@@ -69,29 +84,23 @@ class Play extends React.Component {
     const { boardSize, userName } = this.props.location.state;
     player = userName;
     size = boardSize;
-    /*
-    fetch(' https://aw06fep7p2.execute-api.us-east-1.amazonaws.com/Prod/hello?pairs=10')
-        .then((response) => {
-          if (!response.ok) throw Error(response.statusText);
-          return response.json();
-        })
-        .then((data) => {
-          console.log(data.height)
-          console.log(data.message)
-          /*
-          this.setState({
-            next: data.next,
-            results: data.results,
-            url: data.url,
-          });
-          
-        })
-        .catch((error) => console.log(error));
-        */
 
-        console.log(boardSize)
+    if (player == '' || !player) {
+      player = "Guest";
+    }
+
+    if (size < 2 || size > 50 || !size) {
+      size = 8;
+    }
+
+
+    // These are dummy api's to try out API Gateway and cloudFormation.
+    // The logic implemented in them can be implemented on client side as well
+
+    // This is a way to make more than one api call for this component
     const promises = Promise.all(
-      [fetch(`https://uvyewae4k8.execute-api.us-east-1.amazonaws.com/Prod/leaderboard?pairs=${boardSize}`), fetch(`https://aw06fep7p2.execute-api.us-east-1.amazonaws.com/Prod/hello?pairs=${boardSize}`)]
+      [fetch(`https://uvyewae4k8.execute-api.us-east-1.amazonaws.com/Prod/leaderboard?pairs=${size}`),
+       fetch(`https://aw06fep7p2.execute-api.us-east-1.amazonaws.com/Prod/hello?pairs=${size}`)]
     )
 
     .then(([res1, res2]) => { 
@@ -110,23 +119,21 @@ class Play extends React.Component {
           console.log(this.state.height)
         
         // init pairs
-        //pairs.set('3','9');
-        //pairs.set('9','3');
         let temp = new Set();
         let i
         const { emojis } = this.state
 
         console.log("done fetching")
         console.log
-        for (i = 2; i < boardSize*2 + 2; i++) {
+        for (i = 2; i < size*2 + 2; i++) {
           temp.add(i.toString())
         }
 
         console.log("heading into while")
-        console.log(boardSize)
+        console.log(size)
 
-        var index1 = Math.floor(Math.random()*boardSize + 2);
-        var index2 = Math.floor(Math.random()*boardSize + 2);
+        var index1 = Math.floor(Math.random()*size + 2);
+        var index2 = Math.floor(Math.random()*size + 2);
         console.log(index1)
         console.log(index2)
         let emojiCounter = 0
@@ -156,7 +163,8 @@ class Play extends React.Component {
             temp.forEach((entry) => {
               littleAr.push(entry);
             })
-
+            
+            // handling the last four greatly improves run time for small requests
             pairs.set(littleAr[0].toString(), littleAr[1].toString());
             pairs.set(littleAr[1].toString(), littleAr[0].toString());
             pairs.set(littleAr[2].toString(), littleAr[3].toString());
@@ -183,61 +191,27 @@ class Play extends React.Component {
             itemCounter++;
           }
 
-          index1 = Math.floor(Math.random()*boardSize*2 + 2);
-          index2 = Math.floor(Math.random()*boardSize*2 + 2);
-          console.log(temp)
-          console.log(index1)
-          console.log(index2)
-          console.log(numToEmoji)
-          console.log(pairs)
+          // generate new random numbers
+          index1 = Math.floor(Math.random()*size*2 + 2);
+          index2 = Math.floor(Math.random()*size*2 + 2);
         }
-        console.log(pairs)
+
         this.setState({
           n2e: numToEmoji,
           checkMatch: false,
           studyingMap: true,
         });
       })
-
-    // renderGrid
-    //makeGrid()
-
-     //cards = document.querySelectorAll('.item')
-    //const root = document.documentElement
-    //root.style.setProperty('--emoji-size-1', '3.5vw')
-    //root.style.setProperty('--emoji-size-2', '3.5vw')
-
-    //as the value in the input changes, do something.
-    //let elem = document.getElementById("1");
-
-   //var checkMatch = false
-    //var studyingMap = true
-
-    //var pairs = new Map()
-    //var matched = new Set()
-    //var selected = new Set()
-
-    //pairs.set('3','9')
-    //pairs.set('9','3')
-    //var lastClick
-
-    //eventListener("click", handleInputChange)
-
-
-    console.log("ctor");
          
-
-      
-    // root.style.setProperty('--emoji-size-2', '0vw');
-      //root.style.font-size('0vw')
-
   }
   handleCard (e) {
     e.preventDefault();
-    const {  studyingMap, checkMatch, } = this.state;
+    const {  studyingMap, checkMatch, clicks, score } = this.state;
     let inputId = e.target.id;
-    selected.add(inputId);
+    let foundPair = false;
+    let points = 0;
 
+    selected.add(inputId);
     
     // if player is studing board, do nothing
     if (studyingMap) {
@@ -264,26 +238,33 @@ class Play extends React.Component {
 
     // Check to see if 
     if (lastClick === pairs.get(inputId) && checkMatch) {
-      console.log(lastClick)
-      console.log(pairs.get(inputId))
-      console.log(inputId)
       matched.add(lastClick)
       matched.add(inputId)
       selected.delete(inputId)
 
-      this.sleep(500)
+      this.sleep(0)
         .then( () => {
-        alert("Congrats! You have identified a pair!")
-        })
+        //alert("Congrats! You have identified a pair!");
+          if (clicks > size*2) {
+            points = 100 - (clicks - size*2);
+          } else {
+            points = 100;
+          }
+          this.setState({
+            score: score + points,
+            newPoints: points,
+            success: true,
+          })
+      })
 
     } else if (checkMatch) {
       selected.delete(inputId)
       selected.delete(lastClick)
+      this.setState({
+        success: false,
+      })
 
       this.sleep(500)
-      .then( () => {
-      alert("Oops! These are not a match!")
-      })
       .then( () => {
         this.sleep(1500)
         .then( () => {
@@ -292,10 +273,6 @@ class Play extends React.Component {
                 document.getElementById(card.id).style.setProperty(`--emoji-size-${card.id}`, '0vw')
             }
           })
-         // let oldLabel = `--emoji-size-${lastClick}`
-        //  document.getElementById(inputId).style.setProperty(label, '0vw')
-         // document.getElementById(lastClick).style.setProperty(oldLabel, '0vw')
-          //console.log(oldLabel)
         })
       })
 
@@ -321,33 +298,64 @@ class Play extends React.Component {
           document.getElementById(card).style.setProperty(`--emoji-size-${card}`, '3.5vw');
       })
     }
-
+    let tempClicks = clicks;
     this.setState({
       studyingMap: studyingMap,
       checkMatch: newCheckMatch,
+      score: score + points,
+      clicks: ++tempClicks,
     });
 
     //lastClick = inputId this did not work do to timing issues with the promises above
   }
-
-
-
   
   // clicking 'start' resets the board 
   handleStart (e) {
     e.preventDefault();
+    lastClick = null
+
+    const { studyingMap } = this.state;
+
+    let vw = '3.5vw';
+    startTime = Date.now();
+    if (studyingMap) {
+      vw = '0vw';
+    }
+
     cards.forEach(input => {
       let label = `--emoji-size-${input.id}`
-      document.getElementById(input.id).style.setProperty(label, '0vw')
+      document.getElementById(input.id).style.setProperty(label, vw)
     });
 
 
     // clear any matches, player is no longer studying
     this.setState({
-      studyingMap: false,
+      studyingMap: !studyingMap,
+      score:  0,
+      newPoints: 0,
+      time: 0,
+      clicks: 0,
+      success: false,
+      checkMatch: false,
     });
 
     matched.clear();
+    selected.clear();
+
+    if (studyingMap) {
+      this.timer = setInterval(() => this.setState({
+      time: Math.floor((Date.now() - startTime)/ 1000)
+    }), 1000);
+    } else {
+      clearInterval(this.timer)
+      this.sleep(500)
+      .then (() => {
+        cards.forEach(input => {
+          let label = `--emoji-size-${input.id}`
+          document.getElementById(input.id).style.setProperty(label, '3.5vw');
+          })
+      })
+    }
 
     }
     
@@ -357,7 +365,8 @@ class Play extends React.Component {
     }
 
   render() {
-    const { firstRun, emojis } = this.state;
+    const { firstRun, emojis, studyingMap, score,
+             clicks, time, success, newPoints, } = this.state;
     console.log("in render, top")
     if (!emojis) {
       return (null)
@@ -394,11 +403,23 @@ class Play extends React.Component {
     }
     console.log("rendering!");
     var num = 2
+    let startStop = studyingMap ? "start!" : "start over";
+    let outcome = matched.size/2 == size;
 
+    if (outcome) {
+      clearInterval(this.timer);
+    }
 
     return (
         <div className="play">
-          <div class="input" id="1"><button class="button" onClick={this.handleStart}>start!</button></div>
+          <div class="input" id="1"><button class="button" onClick={this.handleStart}>{startStop}</button>
+              <div class="stats" style={{'font-size': '18px'}}>
+                <p>Clicks: {clicks}</p>
+                <p>Matches: {matched.size/2}</p>
+                <p>Points: {score}</p>
+                <p>Time: {time}</p>
+              </div>  
+          </div>
           <div class="grid" id="0" style={style1}>
               {mapper.map((item) => (
                 <ListBlocks 
@@ -408,8 +429,23 @@ class Play extends React.Component {
                   fxn={this.handleCard}
                 />))}
           </div>
-            <div class="help"><p>Hey {player}, having trouble seeing emojis? Try doing a hard refresh of this page (on Chrome press together: cmd-shift-r).</p></div>
-            {<BootUp key={num} go={checkBoot} sleep={this.sleep}/>}
+          <div class="pcongrats">
+            {<Congrats
+                key={num}
+                go={success}
+                points={newPoints}
+                notPlaying={studyingMap}
+                win={outcome}  
+                time={time}
+                score={score}
+              />}
+          </div>  
+            <div class="help" style={{"tab-size": "2"}}><p> Hey {player}, having trouble seeing emojis? Try doing a hard refresh of this page (on Chrome press together: cmd-shift-r).</p></div>
+            {<BootUp
+              key={num}
+              go={checkBoot}
+              sleep={this.sleep}
+            />}
           </div>
     );
   }
@@ -427,5 +463,14 @@ BootUp.propTypes = {
   go: PropTypes.node.isRequired,
   sleep: PropTypes.node.isRequired,
 };
+
+Congrats.propTypes = {
+  go: PropTypes.node.isRequired,
+  points: PropTypes.node.isRequired,
+  notPlaying: PropTypes.node.isRequired,
+  win: PropTypes.node.isRequired,
+  score: PropTypes.node.isRequired,
+  time: PropTypes.node.isRequired,
+}
 
 export default Play;
