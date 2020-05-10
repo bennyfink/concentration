@@ -9,6 +9,12 @@ Description: >
 Globals:
   Function:
     Timeout: 100
+  Api:
+    # Allows an application running locally on port 8000 to call this API
+    Cors:
+      AllowMethods: "'OPTIONS,POST,GET'"
+      AllowHeaders: "'Content-Type'"
+      AllowOrigin: "'http://MacBook-Pro-2.local:8000'"
 
 Resources:
   LeaderboardFunction:
@@ -41,19 +47,34 @@ Resources:
         Variables:
           PARAM1: VALUE
 
-  Resources:
-  BestFactorsFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
     Properties:
-      CodeUri: py/
-      Handler: bestFactors.lambda_handler
-      Runtime: python3.8
-      Events:
-        BestFactors:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /factors
-            Method: get
+      TableName: leaderboard
+      AttributeDefinitions: 
+        - AttributeName: player
+          AttributeType: S
+        - AttributeName: score
+          AttributeType: name
+      KeySchema: 
+        - AttributeName: id
+          KeyType: HASH
+
+  LambdaFunctionOverHttps:
+  Type: AWS::Serverless::Function
+  Properties:
+    CodeUri: js/
+    Handler: leader.lambdaHandler
+    Runtime: nodejs12.x
+    Policies: AmazonDynamoDBFullAccess
+    Events:
+      HttpPost:
+        Type: Api
+        Properties:
+          Path: '/DynamoDBOperations/DynamoDBManager'
+          Method: any
+
+    
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
@@ -79,13 +100,22 @@ Outputs:
     Description: "Implicit IAM Role created for Hello World function"
     Value: !GetAtt HelloWorldFunctionRole.Arn
 
-  BestFactorsApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  BestFactorsFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt BestFactorsFunction.Arn
-  BestFactorsFunctionIamRole:
+  HelloWorldAPI:
+    Description: "API Gateway endpoint URL for Prod environment for First Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/getChamps/"
+  HelloWorldFunction:
+    Description: "First Lambda Function ARN"
+    Value: !GetAtt HelloWorldFunction.Arn
+  HelloWorldFunctionIamRole:
     Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt BestFactorsRole.Arn
-
+    Value: !GetAtt HelloWorldFunctionRole.Arn
+    
+  LambdaFunctionOverHttpsApi:
+    Description: "API Gateway endpoint URL for Prod environment for First Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/DynamoDBOperations/DynamoDBManager/"
+  LambdaFunctionOverHttps:
+    Description: "First Lambda Function ARN"
+    Value: !GetAtt LambdaFunctionOverHttps.Arn
+  LambdaFunctionOverHttpsIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt LambdaFunctionOverHttpsRole.Arn
