@@ -37,6 +37,10 @@ class Concentration extends React.Component {
         const { gridSize, userName } = this.state;
       return (
         <div className="App">
+          <div class="concentration">Welcome to Concentration!</div>
+          <p></p>
+          <p></p>
+          <p></p>
             <div className="board">
                 <form className="form-wrap" onSubmit={this.handleSubmit}>
                     <p><label for="userName">Enter a nickname!</label></p>
@@ -54,6 +58,9 @@ class Concentration extends React.Component {
                     </Link>
                 </form>
             </div>
+            <p></p>
+            <p></p>
+            <p class="info2">Click <Link to={{pathname: "/templates/leaderboard.html"}}>here</Link> to check out the top global players!</p>
         </div>
       );
     }

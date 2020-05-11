@@ -142,7 +142,7 @@ table{
   color: black;
   border-spacing: 0;
   text-align: center;
-  margin-left:35%; 
+  margin-left:10%; 
   margin-right:50%;
 }
 
@@ -169,6 +169,11 @@ th, td{
 
 th{
   border-bottom-width: 1px;
+  font-size: 3vw;
+}
+
+td{
+  font-size: 2vw;
 }
 
 th:nth-child(even){
@@ -181,4 +186,29 @@ td:nth-child(even){
   border-width: 1px 4px;
   border-color: white;
   border-style: solid;
+}
+
+.pinfo{
+  text-align: left;
+}
+
+.info {
+  color: gold;
+  text-align: left;
+  margin-left:20%; 
+  tab-size: 4;
+  font-size: 2vw;
+}
+
+.info2 {
+  color: dimgray;
+  text-align: center;
+  tab-size: 4;
+  font-size: 2vw;
+}
+
+.concentration {
+  color: lightgrey;
+  text-align: center;
+  font-size: 6vw;
 }

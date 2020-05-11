@@ -34,8 +34,9 @@ exports.lambdaHandler = function(event, context, callback) {
 
     switch (operation) {
         case 'create':
-            dynamo.put({Item: params, TableName: body.tableName}, callback);
-            break;
+            let json = {Item: params, TableName: body.tableName}
+            response = postScore(json).then((response) => {return response});
+            return response;
         case 'read':
             dynamo.get({Key: {player_id: body.id}, TableName: body.tableName}, (err, data) => {
                 console.log(data)
@@ -64,7 +65,7 @@ async function queryThis() {
             ":n" : 'static'
         },
         ScanIndexForward: false,
-        Limit: 3,
+        Limit: 10,
         Select: 'ALL_ATTRIBUTES',
         TableName: 'leaderboard'}
     return  {
@@ -102,3 +103,16 @@ async function getCount(score) {
         'body': JSON.stringify(await dynamo.query(tryThis).promise())
     };
 }
+
+async function postScore(score) {
+    await dynamo.put(score).promise();
+    return  {
+        'statusCode': 201,
+        'headers': {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': true,
+        },
+        'body': "success!"
+    };
+}
+

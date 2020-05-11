@@ -14,6 +14,7 @@ var size;
 var setupDone = false;
 var startTime, outcome;
 var showAlert = false;
+var posted = false;
 
 function ListBlocks ({ pic, fxn, num2e }) {
     let font = {'font-size': `var(--emoji-size-${pic})`}
@@ -77,6 +78,20 @@ class Play extends React.Component {
       htmlWin: null,
       congrats: false,
     };
+     pairs = new Map();
+     numToEmoji = new Map();
+     mapper = new Array();
+     matched = new Set();
+     selected = new Set();
+     cards;
+     lastClick;
+     player;
+     height;
+     size;
+     setupDone = false;
+     startTime, outcome;
+     showAlert = false;
+     posted = false;
 
     this.handleStart = this.handleStart.bind(this);
     this.sleep = this.sleep.bind(this);
@@ -351,6 +366,7 @@ class Play extends React.Component {
 
     matched.clear();
     selected.clear();
+    posted = false;
 
     if (studyingMap) {
       this.timer = setInterval(() => this.setState({
@@ -391,12 +407,12 @@ class Play extends React.Component {
           .then((data) => {
             var rank = data.Count + 1;
             let rankString;
-            if (rank == 0) {
+            if (rank == 1) {
               rankString = 'Congrats! You have the high score. No one';
-            } else if (rank == 1) {
+            } else if (rank == 2) {
               rankString = '1 person';
             } else {
-              rankString = `${rank} people`;
+              rankString = `${rank - 1} people`;
             }
             writeWin = (<p class='congrats'> {rankString} scored higher than you! To view the top scores, click <Link to={{pathname: "/templates/leaderboard.html"}}>here</Link>.</p>)
              this.setState({
@@ -406,12 +422,16 @@ class Play extends React.Component {
           return data;
           })
           .then((data) => {
+            if (posted) {
+              return
+            }
+            posted = true;
             fetch('http://127.0.0.1:3000/DynamoDBOperations/DynamoDBManager/', {
             method: 'POST',
             body: JSON.stringify({
               operation: 'create',
               score: score,
-              player_id: Math.floor(Math.random()*100000000000),
+              id: Math.floor(Math.random()*1000000000).toString(),
               tableName: 'leaderboard',
               name: player,
               time: time,

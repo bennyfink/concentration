@@ -3,12 +3,25 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 var counter = 1
 
+function PlayerTable ({ name, points, time }) {
+    console.log("leaderboard")
+    return (
+        <tr>
+            <td>{counter++}</td>
+            <td>{name}</td>
+            <td>{points}</td>
+            <td>{time}</td>
+        </tr>
+    );
+}
+
 class Leader extends React.Component {
     constructor(props) {
       super(props);
       this.state = {
         leaders: null,
       };
+      counter = 1;
     }
   
     componentDidMount() {
@@ -46,23 +59,38 @@ class Leader extends React.Component {
                     <th>Rank</th>
                     <th>Username</th>
                     <th>Points</th>
+                    <th>Time (seconds)</th>
                 </tr>
-            {leaders.map((person) => {
-                console.log(person);
-                console.log(person.player_id);
-                (<tr>
-                    <td>{counter++}</td>
-                    <td>{person.name}</td>
-                    <td>{person.score}</td>
-                    <td>{person.time}</td>
-                </tr>)
-            })}
+                    {leaders.map((person) => (
+                    <PlayerTable
+                        key={counter}
+                        name={person.name}
+                        points={person.score}
+                        time={person.time}
+                    />
+                    ))}
             </tbody>
            </table>
+           <p></p>
+           <p></p>
+           <div class="pinfo">
+                <div class="info" style={{"tab-size": "4"}}>FAQ:</div>
+                <p class="info" style={{"tab-size": "4"}}>        Why is time recorded on the leaderboard?</p>
+                <li class="info" style={{"tab-size": "4"}}>       Time is not included in ranking, but it is interesting to see if time has a correlation with rank.</li>
+            </div>
+            <p></p>
+            <p></p>
+            <p style={{"text-align": "center", "font-size": "18px"}}>Click <Link to={{pathname: "/templates/"}}>here</Link> to go to the home page.</p>
         </div>
       );
     }
 }
   
+
+PlayerTable.propTypes = {
+    name: PropTypes.node.isRequired,
+    points: PropTypes.node.isRequired,
+    time: PropTypes.node.isRequired,
+};
 
 export default Leader;
