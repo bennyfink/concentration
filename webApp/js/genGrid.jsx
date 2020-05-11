@@ -64,7 +64,7 @@ class Play extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      emojis: new Array(),
+      emojis: null,
       n2e: new Map(),
       checkMatch: false,
       studyingMap: true,
@@ -432,7 +432,7 @@ class Play extends React.Component {
              clicks, time, success, newPoints, htmlWin, congrats } = this.state;
     console.log("in render, top")
     if (!emojis) {
-      return (null)
+      return (<p>Loading...</p>)
     }
     var style1 = {
       '---column-numbergrid-template-columns': `${(size*2)/height}`

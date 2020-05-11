@@ -64,7 +64,7 @@ async function queryThis() {
             ":n" : 'static'
         },
         ScanIndexForward: false,
-        Limit: 3,
+        Limit: 10,
         Select: 'ALL_ATTRIBUTES',
         TableName: 'leaderboard'}
     return  {
