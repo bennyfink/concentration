@@ -98,10 +98,14 @@ class Play extends React.Component {
     // The logic implemented in them can be implemented on client side as well
 
     // This is a way to make more than one api call for this component
-    const promises = Promise.all(
+   /* const promises = Promise.all(
       [fetch(`https://uvyewae4k8.execute-api.us-east-1.amazonaws.com/Prod/leaderboard?pairs=${size}`),
        fetch(`https://aw06fep7p2.execute-api.us-east-1.amazonaws.com/Prod/hello?pairs=${size}`)]
-    )
+    ) */
+    const promises = Promise.all(
+      [fetch(`http://127.0.0.1:3000/leaderboard?pairs=${size}`),
+       fetch(`https://aw06fep7p2.execute-api.us-east-1.amazonaws.com/Prod/hello?pairs=${size}`)])
+
 
     .then(([res1, res2]) => { 
          return Promise.all([res1.json(), res2.json()]) 
