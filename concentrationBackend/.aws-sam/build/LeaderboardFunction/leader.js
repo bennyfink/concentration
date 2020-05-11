@@ -8,7 +8,31 @@ var dynamo = new AWS.DynamoDB.DocumentClient();
  *   - tableName: required for operations that interact with DynamoDB
  *   - payload: a parameter to pass to the operation being performed
  */
-exports.lambdaHandler = function(event, context, callback) {
+exports.lambdaHandler = async () =>{
+    let tryThis = {KeyConditionExpression: "#n = :n",
+                     IndexName: "get-scores",
+                    ConsistentRead: false,
+                    ExpressionAttributeNames: {
+                        "#n": "type"
+                    },
+                    ExpressionAttributeValues: {
+                        ":n" : 'static'
+                    },
+                    ScanIndexForward: false,
+                    Limit: 3,
+                    Select: 'COUNT',
+                    TableName: 'leaderboard'}
+                return  {
+                    'statusCode': 200,
+                    'headers': {
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Credentials': true,
+                    },
+                    'body': JSON.stringify(await dynamo.query(tryThis).promise())
+                };
+}
+
+/*function(event, context, callback) {
     console.log('Received event:', JSON.stringify(event, null, 2));
     let response;
     
@@ -26,7 +50,10 @@ exports.lambdaHandler = function(event, context, callback) {
     var params = {
        // TableName: body.tableName,
         player_id: body.id,
-        AttributeValue: {"name": body.name, "score": body.score}
+        name: body.name, 
+        score: body.score,
+        type:body.type,
+        time: body.time
     }
 
     switch (operation) {
@@ -45,30 +72,8 @@ exports.lambdaHandler = function(event, context, callback) {
             dynamo.delete(body.payload, callback);
             break;
         case 'query':
-            dynamo.query({TableName: body.tableName,
-                            KeyConditionExpression: "#n = :n",
-                            ConsistentRead: false,
-                            ExpressionAttributeNames: {
-                                "#n": "type"
-                              },
-                            ExpressionAttributeValues: {
-                                  ":n" : {
-                                    "S":"dynamic"
-                                  }
-                            },
-                            ScanIndexForward: false,
-                            Limit: 3,
-                            Select: 'ALL_ATTRIBUTES'}, (err, data) => {
-                                console.log(data)
-                                response = {
-                                    'statusCode': 200,
-                                    'headers': {
-                                        'Access-Control-Allow-Origin': '*',
-                                        'Access-Control-Allow-Credentials': true,
-                                        },
-                                    'body': {'message': data}};
-                                    callback(null, response);
-                            });
+            queryThis()
+            async () => 
             break;
 
             break;
@@ -92,3 +97,19 @@ exports.lambdaHandler = function(event, context, callback) {
             callback(`Unknown operation: ${operation}`);
     }
 };
+
+async queryThis() {let tryThis = {KeyConditionExpression: 'id = :artist',
+                                    ExpressionAttributeValues: {
+                                        ':artist': {'S': '21'}
+                                            },
+                                    TableName: 'leaderboard'}
+    return  {
+        'statusCode': 200,
+        'headers': {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': true,
+            },
+        'body': JSON.stringify(await dynamo.query(params).promise())
+};
+}
+*/
