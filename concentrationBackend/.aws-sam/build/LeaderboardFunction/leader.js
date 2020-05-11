@@ -8,31 +8,7 @@ var dynamo = new AWS.DynamoDB.DocumentClient();
  *   - tableName: required for operations that interact with DynamoDB
  *   - payload: a parameter to pass to the operation being performed
  */
-exports.lambdaHandler = async () =>{
-    let tryThis = {KeyConditionExpression: "#n = :n",
-                     IndexName: "get-scores",
-                    ConsistentRead: false,
-                    ExpressionAttributeNames: {
-                        "#n": "type"
-                    },
-                    ExpressionAttributeValues: {
-                        ":n" : 'static'
-                    },
-                    ScanIndexForward: false,
-                    Limit: 3,
-                    Select: 'COUNT',
-                    TableName: 'leaderboard'}
-                return  {
-                    'statusCode': 200,
-                    'headers': {
-                        'Access-Control-Allow-Origin': '*',
-                        'Access-Control-Allow-Credentials': true,
-                    },
-                    'body': JSON.stringify(await dynamo.query(tryThis).promise())
-                };
-}
-
-/*function(event, context, callback) {
+exports.lambdaHandler = function(event, context, callback) {
     console.log('Received event:', JSON.stringify(event, null, 2));
     let response;
     
@@ -72,10 +48,8 @@ exports.lambdaHandler = async () =>{
             dynamo.delete(body.payload, callback);
             break;
         case 'query':
-            queryThis()
-            async () => 
-            break;
-
+            response = queryThis().then((response) => {return response})
+            return response;
             break;
         case 'echo':
             console.log('PAYLOAD:', event.body)
@@ -98,18 +72,26 @@ exports.lambdaHandler = async () =>{
     }
 };
 
-async queryThis() {let tryThis = {KeyConditionExpression: 'id = :artist',
-                                    ExpressionAttributeValues: {
-                                        ':artist': {'S': '21'}
-                                            },
-                                    TableName: 'leaderboard'}
-    return  {
-        'statusCode': 200,
-        'headers': {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Credentials': true,
-            },
-        'body': JSON.stringify(await dynamo.query(params).promise())
-};
-}
-*/
+async function queryThis() {
+        let tryThis = {KeyConditionExpression: "#n = :n",
+                         IndexName: "get-scores",
+                        ConsistentRead: false,
+                        ExpressionAttributeNames: {
+                            "#n": "type"
+                        },
+                        ExpressionAttributeValues: {
+                            ":n" : 'static'
+                        },
+                        ScanIndexForward: false,
+                        Limit: 3,
+                        Select: 'ALL_ATTRIBUTES',
+                        TableName: 'leaderboard'}
+                    return  {
+                        'statusCode': 200,
+                        'headers': {
+                            'Access-Control-Allow-Origin': '*',
+                            'Access-Control-Allow-Credentials': true,
+                        },
+                        'body': JSON.stringify(await dynamo.query(tryThis).promise())
+                    };
+    }
