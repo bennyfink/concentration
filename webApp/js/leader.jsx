@@ -25,7 +25,7 @@ class Leader extends React.Component {
     }
   
     componentDidMount() {
-        fetch('http://127.0.0.1:3000/DynamoDBOperations/DynamoDBManager/', {
+        fetch('https://uvyewae4k8.execute-api.us-east-1.amazonaws.com/Prod/DynamoDBOperations/DynamoDBManager/', {
             method: 'POST',
             body: JSON.stringify({
               operation: 'query',

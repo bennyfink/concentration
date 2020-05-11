@@ -122,7 +122,7 @@ class Play extends React.Component {
        fetch(`https://aw06fep7p2.execute-api.us-east-1.amazonaws.com/Prod/hello?pairs=${size}`)]
     ) */
     const promises = Promise.all(
-      [fetch(`http://127.0.0.1:3000/leaderboard?pairs=${size}`),
+      [fetch(`https://uvyewae4k8.execute-api.us-east-1.amazonaws.com/Prod/leaderboard/?pairs=${size}`),
        fetch(`https://aw06fep7p2.execute-api.us-east-1.amazonaws.com/Prod/hello?pairs=${size}`)])
 
 
@@ -259,7 +259,7 @@ class Play extends React.Component {
 
     document.getElementById(inputId).style.setProperty(label, '3.5vw')
 
-    // Check to see if 
+    // Check to see if we have a match
     if (lastClick === pairs.get(inputId) && checkMatch) {
       matched.add(lastClick)
       matched.add(inputId)
@@ -392,7 +392,7 @@ class Play extends React.Component {
           alert("Congrats! You found all of the pairs. See your results at the bottom of this page!");
           showAlert = false;
         }
-          fetch('http://127.0.0.1:3000/DynamoDBOperations/DynamoDBManager/', {
+          fetch('https://uvyewae4k8.execute-api.us-east-1.amazonaws.com/Prod/DynamoDBOperations/DynamoDBManager/', {
             method: 'POST',
             body: JSON.stringify({
               operation: 'count',
@@ -426,7 +426,7 @@ class Play extends React.Component {
               return
             }
             posted = true;
-            fetch('http://127.0.0.1:3000/DynamoDBOperations/DynamoDBManager/', {
+            fetch('https://uvyewae4k8.execute-api.us-east-1.amazonaws.com/Prod/DynamoDBOperations/DynamoDBManager/', {
             method: 'POST',
             body: JSON.stringify({
               operation: 'create',
@@ -491,7 +491,7 @@ class Play extends React.Component {
 
     if (outcome && !congrats) {
       clearInterval(this.timer);
-      this.handleWin();
+      this.sleep(300).then(() => {this.handleWin()});
       showAlert = true;
     }
 
