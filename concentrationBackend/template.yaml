@@ -47,32 +47,37 @@ Resources:
         Variables:
           PARAM1: VALUE
 
+  LambdaFunctionOverHttps:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: js/
+      Handler: leader.lambdaHandler
+      Runtime: nodejs12.x
+      Policies: AmazonDynamoDBFullAccess
+      Events:
+        HttpPost:
+          Type: Api
+          Properties:
+            Path: /DynamoDBOperations/DynamoDBManager
+            Method: any
+
   DynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: leaderboard
       AttributeDefinitions: 
-        - AttributeName: player
+        - AttributeName: player_id
           AttributeType: S
         - AttributeName: score
-          AttributeType: name
+          AttributeType: N
       KeySchema: 
-        - AttributeName: id
+        - AttributeName: player_id
           KeyType: HASH
-
-  LambdaFunctionOverHttps:
-  Type: AWS::Serverless::Function
-  Properties:
-    CodeUri: js/
-    Handler: leader.lambdaHandler
-    Runtime: nodejs12.x
-    Policies: AmazonDynamoDBFullAccess
-    Events:
-      HttpPost:
-        Type: Api
-        Properties:
-          Path: '/DynamoDBOperations/DynamoDBManager'
-          Method: any
+        - AttributeName: score
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
 
     
 
@@ -93,16 +98,6 @@ Outputs:
   HelloWorldAPI:
     Description: "API Gateway endpoint URL for Prod environment for First Function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: "First Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
-
-  HelloWorldAPI:
-    Description: "API Gateway endpoint URL for Prod environment for First Function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/getChamps/"
   HelloWorldFunction:
     Description: "First Lambda Function ARN"
     Value: !GetAtt HelloWorldFunction.Arn
