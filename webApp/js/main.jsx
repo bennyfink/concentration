@@ -13,34 +13,6 @@ class Concentration extends React.Component {
       this.handleChangeNum = this.handleChangeNum.bind(this);
       this.handleChangeName = this.handleChangeName.bind(this);
     }
-  /*
-    componentDidMount() {
-      if (performance.getEntriesByType('navigation')[0].type === 'back_forward') {
-        this.setState({
-          next: window.history.state.next,
-          results: window.history.state.results,
-          url: window.history.state.url,
-        });
-      } else {
-        const { url } = this.props;
-  
-        fetch(url, { credentials: 'same-origin' })
-          .then((response) => {
-            if (!response.ok) throw Error(response.statusText);
-            return response.json();
-          })
-          .then((data) => {
-            this.setState({
-              next: data.next,
-              results: data.results,
-              url: data.url,
-            });
-            window.history.pushState(this.state, '/');
-          })
-          .catch((error) => console.log(error));
-      }
-    }
-    */
 
     handleSubmit (e) {
         e.preventDefault();

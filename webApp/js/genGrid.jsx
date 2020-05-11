@@ -12,7 +12,8 @@ var player;
 var height;
 var size;
 var setupDone = false;
-var startTime;
+var startTime, outcome;
+var showAlert = false;
 
 function ListBlocks ({ pic, fxn, num2e }) {
     let font = {'font-size': `var(--emoji-size-${pic})`}
@@ -52,7 +53,7 @@ function Congrats ({ go, points, notPlaying, win, score, time, }) {
   } else if (notPlaying) {
     return (<div class="congrats">Press start to play!</div>)
   } else if (win) {
-    return (<div class="congrats">Congrats {player}! You finished in {time} seconds with a score of {score}. You can play this board again or click on one of the links below.</div>)
+    return (<div class="congrats">Congrats {player}! You finished in {time} seconds with a score of {score}. You can play this board again or click on one of the links below. </div>)
     // Display link to post to leaderboard here.
   } else {
     return (<div class="congrats">Try to identify a pair of emojis!</div>)
@@ -73,11 +74,14 @@ class Play extends React.Component {
       success: false,
       clicks: 0,
       time: 0,
+      htmlWin: null,
+      congrats: false,
     };
 
     this.handleStart = this.handleStart.bind(this);
     this.sleep = this.sleep.bind(this);
     this.handleCard = this.handleCard.bind(this);
+    this.handleWin = this.handleWin.bind(this);
   }
 
   componentDidMount() {
@@ -341,6 +345,8 @@ class Play extends React.Component {
       clicks: 0,
       success: false,
       checkMatch: false,
+      htmlWin: null,
+      congrats: false,
     });
 
     matched.clear();
@@ -362,6 +368,59 @@ class Play extends React.Component {
     }
 
     }
+
+    handleWin () {
+        const { score, time } = this.state;
+        let writeWin;
+        if (showAlert) {
+          alert("Congrats! You found all of the pairs. See your results at the bottom of this page!");
+          showAlert = false;
+        }
+          fetch('http://127.0.0.1:3000/DynamoDBOperations/DynamoDBManager/', {
+            method: 'POST',
+            body: JSON.stringify({
+              operation: 'count',
+              score: score,
+              tableName: 'leaderboard',
+            }),
+          })
+          .then((response) => {
+              if (!response.ok) throw Error(response.statusText);
+              return response.json();
+            })
+          .then((data) => {
+            var rank = data.Count + 1;
+            let rankString;
+            if (rank == 0) {
+              rankString = 'Congrats! You have the high score. No one';
+            } else if (rank == 1) {
+              rankString = '1 person';
+            } else {
+              rankString = `${rank} people`;
+            }
+            writeWin = (<p class='congrats'> {rankString} scored higher than you! To view the top scores, click <Link to={{pathname: "/templates/leaderboard.html"}}>here</Link>.</p>)
+             this.setState({
+            htmlWin: writeWin,
+            congrats: true,
+          });
+          return data;
+          })
+          .then((data) => {
+            fetch('http://127.0.0.1:3000/DynamoDBOperations/DynamoDBManager/', {
+            method: 'POST',
+            body: JSON.stringify({
+              operation: 'create',
+              score: score,
+              player_id: Math.floor(Math.random()*100000000000),
+              tableName: 'leaderboard',
+              name: player,
+              time: time,
+              type: "static",
+            }),
+          })
+          })
+          .catch((error) => console.log(error));
+    }
     
     // Define a sleep function so we can show emoji before recognizing a pair alert
     sleep(ms) {
@@ -370,7 +429,7 @@ class Play extends React.Component {
 
   render() {
     const { firstRun, emojis, studyingMap, score,
-             clicks, time, success, newPoints, } = this.state;
+             clicks, time, success, newPoints, htmlWin, congrats } = this.state;
     console.log("in render, top")
     if (!emojis) {
       return (null)
@@ -408,10 +467,12 @@ class Play extends React.Component {
     console.log("rendering!");
     var num = 2
     let startStop = studyingMap ? "start!" : "start over";
-    let outcome = matched.size/2 == size;
+    outcome = matched.size/2 == size;
 
-    if (outcome) {
+    if (outcome && !congrats) {
       clearInterval(this.timer);
+      this.handleWin();
+      showAlert = true;
     }
 
     return (
@@ -439,10 +500,11 @@ class Play extends React.Component {
                 go={success}
                 points={newPoints}
                 notPlaying={studyingMap}
-                win={outcome}  
+                win={congrats}  
                 time={time}
                 score={score}
               />}
+              {htmlWin}
           </div>  
             <div class="help" style={{"tab-size": "2"}}><p> Hey {player}, having trouble seeing emojis? Try doing a hard refresh of this page (on Chrome press together: cmd-shift-r).</p></div>
             {<BootUp

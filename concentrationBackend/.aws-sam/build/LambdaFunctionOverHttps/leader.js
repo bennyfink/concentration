@@ -41,57 +41,64 @@ exports.lambdaHandler = function(event, context, callback) {
                 console.log(data)
             });
             break;
-        case 'update':
-            dynamo.update(body.payload, callback);
-            break;
-        case 'delete':
-            dynamo.delete(body.payload, callback);
-            break;
         case 'query':
-            response = queryThis().then((response) => {return response})
+            response = queryThis().then((response) => {return response});
             return response;
-            break;
-        case 'echo':
-            console.log('PAYLOAD:', event.body)
-             response = {
-                'statusCode': 201,
-                'headers': {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': true,
-                    },
-                'body': JSON.stringify({
-                'message': "success"
-                    // location: ret.data.trim()
-                }),};
-            callback(null, response)
-        case 'ping':
-            callback(null, "pong");
-            break;
+        case 'count':
+            response = getCount(body.score).then((response) => {return response});
+            return response;
         default:
             callback(`Unknown operation: ${operation}`);
     }
 };
 
 async function queryThis() {
-        let tryThis = {KeyConditionExpression: "#n = :n",
-                         IndexName: "get-scores",
-                        ConsistentRead: false,
-                        ExpressionAttributeNames: {
-                            "#n": "type"
-                        },
-                        ExpressionAttributeValues: {
-                            ":n" : 'static'
-                        },
-                        ScanIndexForward: false,
-                        Limit: 3,
-                        Select: 'ALL_ATTRIBUTES',
-                        TableName: 'leaderboard'}
-                    return  {
-                        'statusCode': 200,
-                        'headers': {
-                            'Access-Control-Allow-Origin': '*',
-                            'Access-Control-Allow-Credentials': true,
-                        },
-                        'body': JSON.stringify(await dynamo.query(tryThis).promise())
-                    };
-    }
+    let tryThis = {
+        KeyConditionExpression: "#n = :n",
+        IndexName: "get-scores",
+        ConsistentRead: false,
+        ExpressionAttributeNames: {
+            "#n": "type"
+        },
+        ExpressionAttributeValues: {
+            ":n" : 'static'
+        },
+        ScanIndexForward: false,
+        Limit: 3,
+        Select: 'ALL_ATTRIBUTES',
+        TableName: 'leaderboard'}
+    return  {
+        'statusCode': 200,
+        'headers': {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': true,
+        },
+        'body': JSON.stringify(await dynamo.query(tryThis).promise())
+    };
+}
+
+async function getCount(score) {
+    let tryThis = {
+        KeyConditionExpression: "#n = :n and #s > :s",
+        IndexName: "get-scores",
+        ConsistentRead: false,
+        ExpressionAttributeNames: {
+            "#n": "type",
+            "#s": "score"
+        },
+        ExpressionAttributeValues: {
+            ":n" : 'static',
+            ":s": score
+        },
+        ScanIndexForward: false,
+        Select: 'COUNT',
+        TableName: 'leaderboard'}
+    return  {
+        'statusCode': 200,
+        'headers': {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': true,
+        },
+        'body': JSON.stringify(await dynamo.query(tryThis).promise())
+    };
+}
