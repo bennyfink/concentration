@@ -1,5 +1,4 @@
 # Concentration
-# concentrationBackend
 
 This project contains source code and supporting templates to create a serverless web app called concentration which can be found here: http://concentration-benfink.s3-website-us-east-1.amazonaws.com/templates/
 
