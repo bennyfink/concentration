@@ -27,7 +27,8 @@ function ListBlocks ({ pic, fxn, num2e, }) {
       setupDone = true;
     }
     if (!matched.has(pic) && lastClick && !noCheating.has(pic)) {
-      emoj = "No Cheating!";
+      // emoj = "No Cheating!";
+        emoj = "";
     }
     noCheating.forEach((value, key, map) => {
      // console.log(time - parseInt(value), noCheating)
