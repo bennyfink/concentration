@@ -79,6 +79,21 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+  cloudfrontdistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        DefaultCacheBehavior:
+          ForwardedValues:
+            QueryString: true
+          ViewerProtocolPolicy: allow-all
+          TargetOriginId: S3-concentration-benfink/templates
+        Enabled: true
+        Origins:
+        - CustomOriginConfig:
+            OriginProtocolPolicy: http-only
+          DomainName: concentration-benfink.s3-website-us-east-1.amazonaws.com
+          Id: S3-concentration-benfink/templates
 Outputs:
   LeaderboardApi:
     Description: API Gateway endpoint URL for Prod stage for Hello World function
