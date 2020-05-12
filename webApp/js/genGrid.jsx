@@ -6,6 +6,7 @@ var numToEmoji = new Map();
 var mapper = new Array();
 var matched = new Set();
 var selected = new Set();
+var noCheating = new Map();
 var cards;
 var lastClick;
 var player;
@@ -15,27 +16,41 @@ var setupDone = false;
 var startTime, outcome;
 var showAlert = false;
 var posted = false;
+var lastSelected = null;
+var showing = new Set();
+var victory;
 
-function ListBlocks ({ pic, fxn, num2e }) {
-    let font = {'font-size': `var(--emoji-size-${pic})`}
+function ListBlocks ({ pic, fxn, num2e, }) {
+    let font = {'font-size': `var(--emoji-size-${pic})`};
+    let emoj = num2e.get(pic);
     if (pic == size*2+1) {
       setupDone = true;
     }
+    if (!matched.has(pic) && lastClick && !noCheating.has(pic)) {
+      emoj = "No Cheating!";
+    }
+    noCheating.forEach((value, key, map) => {
+     // console.log(time - parseInt(value), noCheating)
+      if ((Date.now() - parseInt(value)) > 3000 && !selected.has(key) && lastSelected != value && !showing.has(key)) {
+        map.delete(key)
+      }
+    })
+    lastSelected = lastClick;
     return (<div class="item" id={pic} onClick={fxn}>
-                    <div class="emoji" id={pic} style={font}>{num2e.get(pic)}</div>
+                    <div class="emoji" id={pic} style={font}>{emoj}</div>
             </div>);
 }
 
 function BootUp ({ go, sleep }) {
   if (!setupDone && !go) {
-  console.log('Go!')
+  //console.log('Go!')
   document.getElementById(0).style.setProperty('--column-number', (size*2)/height)
   sleep(0)
         .then(() => {
         cards = document.querySelectorAll(".emoji")
         if (cards && setupDone) {
           cards.forEach(input => {
-          console.log("forEach!");
+        //  console.log("forEach!");
           // Might not need this first line (put handler in render)
           //input.addEventListener("click", this.handleCard);
           let label = `--emoji-size-${input.id}`
@@ -52,7 +67,7 @@ function Congrats ({ go, points, notPlaying, win, score, time, }) {
   if (go && !win) {
     return (<div class="congrats">Nice work! You've identified a pair (+{points} points)</div>)
   } else if (notPlaying) {
-    return (<div class="congrats">Press start to play!</div>)
+    return (<div class="congrats">Press start to begin matching!</div>)
   } else if (win) {
     return (<div class="congrats">Congrats {player}! You finished in {time} seconds with a score of {score}. You can play this board again or click on one of the links below. </div>)
     // Display link to post to leaderboard here.
@@ -83,15 +98,18 @@ class Play extends React.Component {
      mapper = new Array();
      matched = new Set();
      selected = new Set();
-     cards;
-     lastClick;
-     player;
-     height;
-     size;
+     noCheating = new Map();
+     showing = new Set();
+     cards = null;
+     lastClick = null;
+     player = null;
+     height = null;
+     size = null;
      setupDone = false;
-     startTime, outcome;
+     startTime = null;
      showAlert = false;
      posted = false;
+     lastSelected = null
 
     this.handleStart = this.handleStart.bind(this);
     this.sleep = this.sleep.bind(this);
@@ -130,35 +148,35 @@ class Play extends React.Component {
          return Promise.all([res1.json(), res2.json()]) 
       })
       .then(([res1, res2]) => {
-        console.log(res1.message)
-        console.log(res2.message)
+       // console.log(res1.message)
+       // console.log(res2.message)
         height = res2.message
         this.setState({
           emojis: res1.message,
           });
         
 
-          console.log(this.state.emojis)
-          console.log(this.state.height)
+       //   console.log(this.state.emojis)
+        //  console.log(this.state.height)
         
         // init pairs
         let temp = new Set();
         let i
         const { emojis } = this.state
 
-        console.log("done fetching")
-        console.log
+       // console.log("done fetching")
+      //  console.log
         for (i = 2; i < size*2 + 2; i++) {
           temp.add(i.toString())
         }
 
-        console.log("heading into while")
-        console.log(size)
+       // console.log("heading into while")
+      //  console.log(size)
 
         var index1 = Math.floor(Math.random()*size + 2);
         var index2 = Math.floor(Math.random()*size + 2);
-        console.log(index1)
-        console.log(index2)
+       // console.log(index1)
+       // console.log(index2)
         let emojiCounter = 0
         let itemCounter = 2
         
@@ -218,6 +236,9 @@ class Play extends React.Component {
           index1 = Math.floor(Math.random()*size*2 + 2);
           index2 = Math.floor(Math.random()*size*2 + 2);
         }
+        startTime = Date.now()
+        this.timer = setInterval(() => this.setState({
+          time: Math.floor((Date.now() - startTime)/ 1000)}));
 
         this.setState({
           n2e: numToEmoji,
@@ -229,12 +250,12 @@ class Play extends React.Component {
   }
   handleCard (e) {
     e.preventDefault();
-    const {  studyingMap, checkMatch, clicks, score } = this.state;
+    const {  studyingMap, checkMatch, clicks, score, time, } = this.state;
     let inputId = e.target.id;
-    let foundPair = false;
     let points = 0;
 
     selected.add(inputId);
+    noCheating.set(inputId, Date.now());
     
     // if player is studing board, do nothing
     if (studyingMap) {
@@ -258,6 +279,7 @@ class Play extends React.Component {
     
 
     document.getElementById(inputId).style.setProperty(label, '3.5vw')
+    showing.add(inputId)
 
     // Check to see if we have a match
     if (lastClick === pairs.get(inputId) && checkMatch) {
@@ -294,6 +316,7 @@ class Play extends React.Component {
             cards.forEach((card) => {
               if (!matched.has(card.id) && !selected.has(card.id)) {
                 document.getElementById(card.id).style.setProperty(`--emoji-size-${card.id}`, '0vw')
+                showing.delete(card.id)
             }
           })
         })
@@ -306,14 +329,6 @@ class Play extends React.Component {
 
     // toggle checkMatch
     let newCheckMatch = checkMatch ? false : true;
-    console.log(inputId);
-    console.log(lastClick);
-    console.log(pairs.get(inputId));
-    console.log(pairs);
-    console.log("============================")
-    console.log(cards)
-    console.log(selected)
-    console.log(matched)
 
     // ensure all matched display properly
     if (matched.size > 0) {
@@ -337,10 +352,15 @@ class Play extends React.Component {
     e.preventDefault();
     lastClick = null
 
-    const { studyingMap } = this.state;
+    const { studyingMap, congrats } = this.state;
+
+    if (congrats) {
+       startTime = Date.now();
+      this.timer = setInterval(() => this.setState({
+        time: Math.floor((Date.now() - startTime)/ 1000)}));
+    }
 
     let vw = '3.5vw';
-    startTime = Date.now();
     if (studyingMap) {
       vw = '0vw';
     }
@@ -366,21 +386,20 @@ class Play extends React.Component {
 
     matched.clear();
     selected.clear();
+    noCheating.clear();
     posted = false;
+    showing = new Set();
+    lastSelected = null;
 
-    if (studyingMap) {
-      this.timer = setInterval(() => this.setState({
-      time: Math.floor((Date.now() - startTime)/ 1000)
-    }), 1000);
-    } else {
-      clearInterval(this.timer)
-      this.sleep(500)
-      .then (() => {
-        cards.forEach(input => {
-          let label = `--emoji-size-${input.id}`
-          document.getElementById(input.id).style.setProperty(label, '3.5vw');
-          })
-      })
+      if (!studyingMap ) {
+        startTime = Date.now()
+        this.sleep(500)
+        .then (() => {
+          cards.forEach(input => {
+            let label = `--emoji-size-${input.id}`
+            document.getElementById(input.id).style.setProperty(label, '3.5vw');
+            })
+        })
     }
 
     }
@@ -450,7 +469,7 @@ class Play extends React.Component {
   render() {
     const { firstRun, emojis, studyingMap, score,
              clicks, time, success, newPoints, htmlWin, congrats } = this.state;
-    console.log("in render, top")
+    //console.log("in render, top")
     if (!emojis) {
       return (<p>Loading...</p>)
     }
@@ -473,7 +492,7 @@ class Play extends React.Component {
           cards = document.querySelectorAll('.item')
           if (cards) {
             cards.forEach(input => {
-            console.log("forEach!");
+           // console.log("forEach!");
             // Might not need this first line (put handler in render)
             //input.addEventListener("click", this.handleCard);
             let label = `--emoji-size-${input.id}`;
@@ -484,7 +503,7 @@ class Play extends React.Component {
     } else {
       document.getElementById(0).style.setProperty('--column-number', (size*2)/height)
     }
-    console.log("rendering!");
+   // console.log("rendering!");
     var num = 2
     let startStop = studyingMap ? "start!" : "start over";
     outcome = matched.size/2 == size;
@@ -558,5 +577,6 @@ Congrats.propTypes = {
   score: PropTypes.node.isRequired,
   time: PropTypes.node.isRequired,
 }
+
 
 export default Play;

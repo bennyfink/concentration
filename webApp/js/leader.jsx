@@ -37,9 +37,18 @@ class Leader extends React.Component {
           })
           .then((data) => {
             console.log(data);
-            this.setState({
-                leaders: data.Items,
+            let orderThis = data.Items;
+
+            // include time in rankings
+            orderThis.sort((a, b) => {
+              if (a.score === b.score)
+              return a.time - b.time
             });
+
+            this.setState({
+                leaders: orderThis,
+            });
+
           })
           .catch((error) => console.log(error));
         }
@@ -76,11 +85,11 @@ class Leader extends React.Component {
            <div class="pinfo">
                 <div class="info" style={{"tab-size": "4"}}>FAQ:</div>
                 <p class="info" style={{"tab-size": "4"}}>        Why is time recorded on the leaderboard?</p>
-                <li class="info" style={{"tab-size": "4"}}>       Time is not included in ranking, but it is interesting to see if time has a correlation with rank.</li>
+                <li class="info" style={{"tab-size": "4"}}>       Time is a great measurement of conentration. Your time includes time spent studying the board and identifying pairs. It acts as the tie breaker in rankings.</li>
             </div>
             <p></p>
             <p></p>
-            <p style={{"text-align": "center", "font-size": "18px"}}>Click <Link to={{pathname: "/templates/"}}>here</Link> to go to the home page.</p>
+            <p class="info2">Click <Link to={{pathname: "/templates/"}}>here</Link> to go to the home page.</p>
         </div>
       );
     }

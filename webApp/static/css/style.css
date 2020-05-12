@@ -196,6 +196,7 @@ td:nth-child(even){
   color: gold;
   text-align: left;
   margin-left:20%; 
+  margin-right: 20%;
   tab-size: 4;
   font-size: 2vw;
 }

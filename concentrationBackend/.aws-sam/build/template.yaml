@@ -61,6 +61,8 @@ Resources:
         AttributeType: N
       - AttributeName: type
         AttributeType: S
+      - AttributeName: time
+        AttributeType: N
       GlobalSecondaryIndexes:
       - IndexName: get-scores
         KeySchema:
@@ -76,6 +78,8 @@ Resources:
       KeySchema:
       - AttributeName: player_id
         KeyType: HASH
+      - AttributeName: time
+        KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
