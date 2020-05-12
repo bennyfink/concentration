@@ -1,0 +1,2 @@
+aws s3 sync webApp s3://concentration-benfink --region us-east-1
+
