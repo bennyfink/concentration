@@ -6,5 +6,5 @@ The application uses several AWS resources, including Lambda functions, DynamoDB
 
 
 
-* concentrationBackend uses AWS Serverless Application Model (SAM) to create the serverless functions with CloudFormation (the GO function needs proper CORs headers still; `sampy` is a temporary gateway fix)
-* webApp contains the static and dynamic (React.js) code for the client
+* `concentrationBackend` uses AWS Serverless Application Model (SAM) to create the serverless functions with CloudFormation (the GO function needs proper CORs headers still; `sampy` is a temporary gateway fix)
+* `webApp` contains the static and dynamic (React.js) code for the client
