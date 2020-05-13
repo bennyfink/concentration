@@ -85,7 +85,7 @@ class Leader extends React.Component {
            <div class="pinfo">
                 <div class="info" style={{"tab-size": "4"}}>FAQ:</div>
                 <p class="info" style={{"tab-size": "4"}}>        Why is time recorded on the leaderboard?</p>
-                <li class="info" style={{"tab-size": "4"}}>       Time is a great measurement of conentration. Your time includes time spent studying the board and identifying pairs. It acts as the tie breaker in rankings.</li>
+                <li class="info" style={{"tab-size": "4"}}>       Time is a great measurement of concentration. Your time includes time spent studying the board and identifying pairs. It acts as the tie breaker in rankings.</li>
             </div>
             <p></p>
             <p></p>
