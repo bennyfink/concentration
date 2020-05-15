@@ -1,0 +1,47 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0",
+    "title": "concentrationBackend"
+  },
+  "host": "uvyewae4k8.execute-api.us-east-1.amazonaws.com",
+  "basePath": "/Prod",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/DynamoDBOperations/DynamoDBManager": {
+      "x-amazon-apigateway-any-method": {
+        "responses": {}
+      }
+    },
+    "/hello": {
+      "get": {
+        "responses": {}
+      },
+      "options": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {}
+      }
+    },
+    "/leaderboard": {
+      "get": {
+        "responses": {}
+      },
+      "options": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {}
+      }
+    }
+  }
+}
